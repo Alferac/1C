@@ -1,0 +1,41 @@
+# Клиент-серверный стенд для модуля 12.
+# Минимум: только СУБД (сервер 1С ставится нативно на хост).
+#   docker compose up -d mssql
+# Полностью в контейнерах: соберите образ сервера через onec-docker и раскомментируйте onec-server.
+name: onec-lab
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: onec-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"                    # бесплатная редакция для разработки и тестирования
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      MSSQL_COLLATION: "Cyrillic_General_CI_AS" # сортировка, ожидаемая 1С для русскоязычных баз
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
+    restart: unless-stopped
+
+#  onec-server:
+#    image: ${ONEC_SERVER_IMAGE}
+#    container_name: onec-server
+#    hostname: onec-server                  # пропишите "127.0.0.1 onec-server" в hosts хоста
+#    depends_on: [mssql]
+#    ports:
+#      - "1540:1540"                         # ragent
+#      - "1541:1541"                         # rmngr
+#      - "1560-1591:1560-1591"               # рабочие процессы
+#    volumes:
+#      - onec-data:/home/usr1cv8/.1cv8       # реестр кластера
+#      - onec-licenses:/var/1C/licenses      # файл комьюнити-лицензии
+#      - onec-logs:/var/log/1C               # технологический журнал (logcfg.xml)
+#    restart: unless-stopped
+
+volumes:
+  mssql-data:
+#  onec-data:
+#  onec-licenses:
+#  onec-logs:
